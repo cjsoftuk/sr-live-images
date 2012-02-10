@@ -24,3 +24,9 @@ EOF
 chmod +x config/includes.chroot/lib/live/config/999-set-root-password
 
 # Add extra packages 
+mkdir -p config/package-lists/
+cat <<EOF >config/package-lists/sr-extra-apps.list.chroot
+git-core
+vim
+geany
+EOF
