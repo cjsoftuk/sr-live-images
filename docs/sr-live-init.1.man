@@ -1,0 +1,13 @@
+.TH SR-LIVE-INIT 1 "FEBRUARY 2012" "SR Router" "Management Utilities"
+.SH NAME 
+sr-live-init \- Initialises the PXE boot environment
+.SH SYNOPSIS
+.B sr-live-init
+.SH DESCRIPTION
+Initialises a TFTP root in /srv/tftp, and creates & exports /srv/nfs via the
+NFS kernel server.
+.SH OPTIONS
+This command takes no options.
+.SH AUTHOR
+Chris Malton <cmalton at studentrobotics dot org>
+.SH SEE ALSO
