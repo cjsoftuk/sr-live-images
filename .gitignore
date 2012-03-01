@@ -1,0 +1,9 @@
+cache/*
+*/binary
+*/binary.packages
+*/chroot
+*/chroot.packages.install
+*/chroot.packages.live
+*/config
+*/tftpboot
+*/binary-net.tar.gz
