@@ -29,4 +29,5 @@ cat <<EOF >config/package-lists/sr-extra-apps.list.chroot
 git-core
 vim
 geany
+chromium-browser
 EOF
