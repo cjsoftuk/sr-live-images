@@ -65,7 +65,7 @@ EOF
 
 	# Get rid of any old references
 	sed -ri 'D|^include config/$1.cfg|' /srv/tftp/config/${CONFIG_NAME}.cfg
-	echo "include config/$1.cfg" >> /srv/tftp/config/${CONFIG_NAME}.cfg"
+	echo "include config/$1.cfg" >> /srv/tftp/config/${CONFIG_NAME}.cfg
 	
 	shift
 done
