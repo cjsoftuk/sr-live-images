@@ -53,5 +53,4 @@ include config/${SUBNET}-images.cfg
 include config/common-tail.cfg
 EOF
 
-	touch /srv/tftp/config/$SUBNET.cfg
 done
