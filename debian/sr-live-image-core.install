@@ -1,0 +1,2 @@
+core/bin/sr-live-* /usr/bin/
+core/share/* /usr/share/sr-live-image/

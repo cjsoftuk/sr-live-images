@@ -1,0 +1,18 @@
+#!/usr/bin/make -f
+
+DEB_DIVERT_EXTENSION = .sr
+
+include /usr/share/cdbs/1/rules/debhelper.mk
+include /usr/share/cdbs/1/rules/config-package.mk
+include /usr/share/cdbs/1/rules/divert.mk
+
+DOCS_sr-live-image-core = docs/sr-live-build.1.gz docs/sr-live-add.1.gz docs/sr-live-remove.1.gz docs/sr-live-init.1.gz
+
+%.gz: %.man
+	gzip -c $< > $@
+
+build/sr-live-image-core:: $(DOCS_sr-live-image-core)
+
+override_dh_clean:
+	dh_clean
+	rm $(DOCS_sr-live-image-core)

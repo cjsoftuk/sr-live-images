@@ -1,0 +1,21 @@
+Source: sr-live-image
+Section: net
+Priority: extra
+Maintainer: Chris Malton <cmalton@studentrobotics.org>
+Build-Depends: cdbs (>= 0.4.23-1.1), debhelper (>= 4.2.0), config-package-dev (>= 4.5~)
+Standards-Version: 3.8.0
+
+Package: sr-live-image-core
+Architecture: all
+Depends: atftpd, syslinux
+Description: Student Robotics Live Image - Core
+ Core tools and libraries for the SR Live boot configuration.  This depends
+ on atftpd to serve the TFTP data, and PXELinux (part of syslinux) for the 
+ loader.
+
+Package: sr-live-image-competitor-client
+Architecture: all
+Depends: sr-live-image-core
+Description: Student Robotics Live Image - Competitor Client
+ This package installs the Student Robotics Competitor Client configuration
+ for use with the tools provided in sr-live-image-tools.
