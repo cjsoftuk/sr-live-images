@@ -1,0 +1,60 @@
+#! /bin/bash
+
+# Create a basic config
+lb config noauto -d squeeze -a i386 -m http://ftp.uk.debian.org/debian/ --net-root-path /srv/tftp/video --net-root-server 172.19.0.1 --bootappend-live "live-config.noroot" -b net
+
+# Add the udev rule to hide disks
+mkdir -p config/includes.chroot/etc/udev/rules.d/
+cat <<EOF > config/includes.chroot/etc/udev/rules.d/999-hide-local-disks.rules
+SUBSYSTEMS=="usb", GOTO="sr_is_usb_mass_storage_device"
+
+ACTION=="add|change", SUBSYSTEM=="block", ENV{UDISKS_AUTOMOUNT_HINT}="never", ENV{UDISKS_PRESENTATION_HIDE}="1"
+
+LABEL="sr_is_usb_mass_storage_device"
+EOF
+
+# Add the set-root-password boot task
+mkdir -p config/includes.chroot/lib/live/config/
+cat <<EOF > config/includes.chroot/lib/live/config/999-set-root-password
+#! /bin/bash
+
+# Set root's password on the target system
+sed -ri 's|^root(.*)$|root:\$6\$ib9QZokx\$tP4h4YXGaWIpIcRS8Vw1FS.FF1xbwzOckAc3etiMekeYFNqFDKhA01/ajTdXF6nDGjvcsiRthRko2lJ7v.xJr1:15379:0:99999:7:::|' /etc/shadow
+EOF
+chmod +x config/includes.chroot/lib/live/config/999-set-root-password
+
+# Add extra packages 
+mkdir -p config/package-lists/
+cat <<EOF >config/package-lists/sr-extra-apps.list.chroot
+vlc-nox
+EOF
+
+# Add jtvlc to the build
+wget -O /tmp/jtvlc.tar.gz http://apiwiki.justin.tv/mediawiki/images/2/24/Jtvlc-lin-0.41.tar.gz
+mkdir -p config/includes.chroot/usr/local/jtvlc/
+tar -zxvf /tmp/jtvlc.tar.gz -c config/includes.chroot/usr/local/jtvlc/
+
+# Add the script to broadcast
+cat <<EOF >config/includes.chroot/usr/local/bin/go-live.sh
+#! /bin/bash
+# Get the config from VACS (Video AutoConfig Server)
+wget http://vacs.net.studentrobotics.org/`hostname`.cfg -O /tmp/vacs.cfg
+
+# Load the config
+. /tmp/vacs.cfg
+
+PORT="5004"
+
+SDP=`tempfile --prefix=justinSDP`
+if [ -f $SDP ]; then rm $SDP; fi
+
+echo "SDP file is: $SDP";
+
+# Start VLC
+cvlc $@ --sout="#transcode{vcodec=h264,vb=200,fps=30,scale=0,acodec=mp4a,ab=64,channels=2,samplerate=44100}:rtp{dst=127.0.0.1,port=$PORT,sdp=file://$SDP}" --sout-x264-quiet &
+VLCPID=$!
+sleep 5 # Give VLC some time to get streaming
+echo "About to start streaming, Ctrl+C to stop...."
+~/Applications/jtvlc-lin-0.41/jtvlc $JUSTIN_LOGIN $STREAMKEY "$SDP"
+kill $VLCPID
+EOF
