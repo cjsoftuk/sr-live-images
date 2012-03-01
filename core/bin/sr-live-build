@@ -1,0 +1,24 @@
+#! /bin/sh
+set -e
+
+# Build the new images
+
+while [ $# -gt 0 ]; do
+	if [ ! -d /usr/share/sr-live-image/$1 ]; then
+		echo "E: $1 is not a valid image name!"
+		exit 1
+	fi
+
+	# Enter the folder
+	pushd /usr/share/sr-live-image/$1 2>&1 >/dev/null
+
+	# Configure the image
+	lb config
+	# Build the image
+	lb build
+
+	# Exit the folder
+	popd 2>&1 >/dev/null	
+
+	shift
+done

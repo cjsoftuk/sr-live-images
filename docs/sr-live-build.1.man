@@ -1,0 +1,13 @@
+.TH SR-LIVE-BUILD 1 "MARCH 2012" "SR Router" "Management Utilities"
+.SH NAME 
+sr-live-build \- Builds images for the PXE boot environment
+.SH SYNOPSIS
+.B sr-live-build image1 [image2 [image3....]]
+.SH DESCRIPTION
+Build image1, then image2 (if specified).  Valid image names can be
+found by listing the contents of /usr/share/sr-live-image/
+.SH OPTIONS
+This command takes no options.
+.SH AUTHOR
+Chris Malton <cmalton at studentrobotics dot org>
+.SH SEE ALSO
