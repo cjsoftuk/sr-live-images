@@ -19,3 +19,10 @@ Depends: sr-live-image-core
 Description: Student Robotics Live Image - Competitor Client
  This package installs the Student Robotics Competitor Client configuration
  for use with the tools provided in sr-live-image-tools.
+
+Package: sr-live-image-video
+Architecture: all
+Depends: sr-live-image-core
+Description: Student Robotics Live Image - Video Streaming Client
+ This package installs the Student Robotics Video Streaming Client configuration
+ for use with the tools provided in sr-live-image-tools.
