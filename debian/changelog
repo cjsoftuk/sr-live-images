@@ -1,4 +1,4 @@
-sr-live-images (0.1) squeeze; urgency=low
+sr-live-image (0.1) squeeze; urgency=low
   * Initial deployment of the boot-images.
 
  -- Chris Malton <cmalton@studentrobotics.org>  Fri, 3 Mar 2012 09:00:00 +0000
