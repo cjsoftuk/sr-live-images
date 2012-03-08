@@ -1,7 +1,7 @@
 #! /bin/bash
 
 # Create a basic config
-lb config noauto -d squeeze -a i386 -m http://ftp.uk.debian.org/debian/ --net-root-path /srv/tftp/video --net-root-server 172.19.0.1 --bootappend-live "live-config.noroot" -b net
+lb config noauto -d wheezy -a i386 -m http://ftp.uk.debian.org/debian/ --net-root-path /srv/tftp/video --net-root-server 172.19.0.1 --bootappend-live  --hostname video "live-config.noroot" -b net
 
 # Add the udev rule to hide disks
 mkdir -p config/includes.chroot/etc/udev/rules.d/
@@ -26,35 +26,44 @@ chmod +x config/includes.chroot/lib/live/config/999-set-root-password
 # Add extra packages 
 mkdir -p config/package-lists/
 cat <<EOF >config/package-lists/sr-extra-apps.list.chroot
+python-twisted
 vlc-nox
 EOF
 
+# Add debian-multimedia to get a sane version of VLC
+echo "deb http://www.debian-multimedia.org squeeze main non-free" > config/archives/debian-multimedia.list.chroot
+cp auto/debian-multimedia-keyring.gpg config/archives/debian-multimedia.key.chroot
+
 # Add jtvlc to the build
-wget -O /tmp/jtvlc.tar.gz http://apiwiki.justin.tv/mediawiki/images/2/24/Jtvlc-lin-0.41.tar.gz
-mkdir -p config/includes.chroot/usr/local/jtvlc/
-tar -zxvf /tmp/jtvlc.tar.gz -c config/includes.chroot/usr/local/jtvlc/
+mkdir -p config/includes.chroot/usr/local/jtvlc
+cp auto/jtvlc/* config/includes.chroot/usr/local/jtvlc/
 
 # Add the script to broadcast
-cat <<EOF >config/includes.chroot/usr/local/bin/go-live.sh
+mkdir -p config/includes.chroot/usr/local/bin/
+cat <<EOF >config/includes.chroot/usr/local/bin/go-live
 #! /bin/bash
 # Get the config from VACS (Video AutoConfig Server)
-wget http://vacs.net.studentrobotics.org/`hostname`.cfg -O /tmp/vacs.cfg
+wget http://vacs.net.studentrobotics.org/\`hostname\`.cfg -O /tmp/vacs.cfg
 
 # Load the config
 . /tmp/vacs.cfg
 
 PORT="5004"
 
-SDP=`tempfile --prefix=justinSDP`
-if [ -f $SDP ]; then rm $SDP; fi
+SDP=\`tempfile --prefix=justinSDP\`
+if [ -f \$SDP ]; then rm \$SDP; fi
 
-echo "SDP file is: $SDP";
+echo "SDP file is: \$SDP";
 
 # Start VLC
-cvlc $@ --sout="#transcode{vcodec=h264,vb=200,fps=30,scale=0,acodec=mp4a,ab=64,channels=2,samplerate=44100}:rtp{dst=127.0.0.1,port=$PORT,sdp=file://$SDP}" --sout-x264-quiet &
-VLCPID=$!
+cvlc v4l2:///dev/video0 --v4l2-aspect-ratio 16\:9 --sout="#transcode{vcodec=h264,vb=200,fps=30,scale=0,acodec=mp4a,ab=64,channels=2,samplerate=44100}:duplicate{dst=rtp{dst=127.0.0.1,port=\$PORT,sdp=file://\$SDP},dst=standard{access=http,mux=ts,dst=0.0.0.0:8080}}" &
+VLCPID=\$!
 sleep 5 # Give VLC some time to get streaming
 echo "About to start streaming, Ctrl+C to stop...."
-~/Applications/jtvlc-lin-0.41/jtvlc $JUSTIN_LOGIN $STREAMKEY "$SDP"
-kill $VLCPID
+python /usr/local/jtvlc/jtvlc.py \$JUSTIN_LOGIN \$STREAMKEY "\$SDP"
+kill \$VLCPID
 EOF
+
+chmod +x config/includes.chroot/usr/local/bin/go-live
+
+
