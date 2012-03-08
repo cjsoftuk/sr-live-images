@@ -2,7 +2,7 @@
 .SH NAME 
 sr-live-add \- Adds images to the PXE boot environment
 .SH SYNOPSIS
-.B sr-live-build image1 [image2 [image3....]]
+.B sr-live-add image1 [image2 [image3....]]
 .SH DESCRIPTION
 Add image1, then image2 (if specified) to the PXE environment.  
 Valid image names can be found by listing the contents of 
