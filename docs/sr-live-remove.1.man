@@ -1,0 +1,15 @@
+.TH SR-LIVE-REMOVE 1 "MARCH 2012" "SR Router" "Management Utilities"
+.SH NAME 
+sr-live-remove \- Adds images to the PXE boot environment
+.SH SYNOPSIS
+.B sr-live-remove image1 [image2 [image3....]]
+.SH DESCRIPTION
+Remove image1, then image2 (if specified) from the PXE environment.  
+Valid image names can be found by listing the contents of 
+/usr/share/sr-live-image/.  The image must have been built using
+sr-live-build first.
+.SH OPTIONS
+This command takes no options.
+.SH AUTHOR
+Chris Malton <cmalton at studentrobotics dot org>
+.SH SEE ALSO
