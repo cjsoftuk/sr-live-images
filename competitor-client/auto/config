@@ -31,3 +31,11 @@ vim
 geany
 chromium-browser
 EOF
+
+# Make the system log out of the competition network on shutdown.....
+mkdir -p config/includes.chroot/etc/rc0.d/
+cat > config/includes.chroot/etc/rc0.d/K01sr-network-logout <<EOF
+#! /bin/sh
+wget -q -O /dev/null http://auth.net.studentrobotics.org/deauth_client.php
+EOF
+chmod +x config/includes.chroot/etc/rc0.d/K01sr-network-logout
