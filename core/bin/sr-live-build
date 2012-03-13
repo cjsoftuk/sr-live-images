@@ -10,7 +10,8 @@ while [ $# -gt 0 ]; do
 	fi
 
 	# Enter the folder
-	pushd /usr/share/sr-live-image/$1 2>&1 >/dev/null
+	OLD_CWD=`pwd`
+	cd /usr/share/sr-live-image/$1
 
 	# Configure the image
 	lb config
@@ -18,7 +19,7 @@ while [ $# -gt 0 ]; do
 	lb build
 
 	# Exit the folder
-	popd 2>&1 >/dev/null	
+	cd $OLD_CWD
 
 	shift
 done
