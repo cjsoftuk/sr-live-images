@@ -1,0 +1,25 @@
+#! /bin/sh
+set -e
+
+if [ $# -lt 2 ]; then
+	echo "Usage: $0 MAC image"
+fi
+
+if echo $1 | grep -vE '([0-9A-F]{2}\-){5}[0-9A-F]{2}' 2>&1 >/dev/null; then
+	echo "E: MAC $1 must be in upper case."
+fi
+
+# Force-boot a client as a specific image
+
+if [ ! -f /srv/tftp/config/$2.cfg ]; then
+	echo "E: $2 is not an installed image.  Use sr-live-add to add this live image!"
+	exit 1
+fi
+
+cat >/srv/tftp/pxelinux.cfg/01-$1 <<EOF
+include config/common.cfg
+include config/$2.cfg
+include config/common-tail.cfg
+
+timeout 10
+EOF
