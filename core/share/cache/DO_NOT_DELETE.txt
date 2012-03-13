@@ -1,3 +1,0 @@
-This file exists to allow git to record the cache folder.
-
-This folder is used as a cache of debs.
