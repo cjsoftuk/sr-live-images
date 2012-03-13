@@ -55,6 +55,6 @@ EOF
 
 done
 
-sed -iE 's|^/srv/nfs||g' /etc/exports
+sed -iE 's|^/srv/nfs(.*)$||g' /etc/exports
 echo "/srv/nfs 172.18.0.0/16(ro,sync,no_subtree_check)" >> /etc/exports
  
