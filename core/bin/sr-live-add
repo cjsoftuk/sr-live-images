@@ -4,7 +4,7 @@ set -e
 ip_for_subnet(){
 	for IP in `ip addr | grep "inet " | grep -v "127.0.0.1" | awk '{print $2;}' | awk -F/ '{print $1;}'`; do
 		SUBNET=`echo $IP | awk -F. '{print $1 "." $2 "." $3 ".0";}'`
-		if [ "$SUBNET" == "$1" ]; then
+		if [ "$SUBNET" = "$1" ]; then
 			BOOT_IP="$IP"
 		fi
 	done
@@ -30,7 +30,7 @@ while [ $# -gt 0 ]; do
 	# We have a root FS, and bootloader config
 	. /usr/share/sr-live-image/$1/bootloader.cfg
 
-	if [ "$BOOT_SUBNET" == "" ]; then
+	if [ "$BOOT_SUBNET" = "" ]; then
 		echo "E: BOOT_SUBNET is not set.  Cannot configure for unknown subnet."
 		exit 1
 	fi
@@ -47,7 +47,9 @@ while [ $# -gt 0 ]; do
 
 	mkdir -p /srv/nfs/$1/
 
-	CONFIG_NAME=`gethostip $BOOT_SUBNET | awk '{print substr($3,0,6}'`
+	CONFIG_NAME=`gethostip $BOOT_SUBNET | awk '{print substr($3,0,6);}'`
+
+	mkdir -p /srv/tftp/images/
 
 	cp /usr/share/sr-live-image/$1/binary/live/$BOOT_KERNEL /srv/tftp/images/vmlinuz-$1
 	cp /usr/share/sr-live-image/$1/binary/live/$BOOT_INITRD /srv/tftp/images/initrd.img-$1
