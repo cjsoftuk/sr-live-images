@@ -11,7 +11,7 @@ mkdir -p /srv/tftp/config
 
 cp /usr/lib/syslinux/pxelinux.0 /srv/tftp/pxelinux.0
 cp /usr/lib/syslinux/vesamenu.c32 /srv/tftp/pxelinux.cfg/vesamenu.c32
-cp /usr/share/sr-live-image/spash.png /srv/tftp/pxelinux.cfg/splash.png
+cp /usr/share/sr-live-image/splash.png /srv/tftp/pxelinux.cfg/splash.png
 
 cat <<EOF > /srv/tftp/config/common.cfg
 menu hshift 15
