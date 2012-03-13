@@ -30,6 +30,12 @@ git-core
 vim
 geany
 chromium-browser
+python-serial
+python-usb
+python-yaml
+python-opencv
+python-cairo
+python-gtk2
 EOF
 
 # Make the system log out of the competition network on shutdown.....
