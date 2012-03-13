@@ -64,8 +64,8 @@ label $1
 EOF
 
 	# Get rid of any old references
-	sed -ri 'D|^include config/$1.cfg|' /srv/tftp/config/${CONFIG_NAME}.cfg
-	echo "include config/$1.cfg" >> /srv/tftp/config/${CONFIG_NAME}.cfg
+	sed -ri 'D|^include config/$1.cfg|' /srv/tftp/config/${CONFIG_NAME}-images.cfg
+	echo "include config/$1.cfg" >> /srv/tftp/config/${CONFIG_NAME}-images.cfg
 	
 	shift
 done
