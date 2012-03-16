@@ -39,9 +39,42 @@ python-gtk2
 EOF
 
 # Make the system log out of the competition network on shutdown.....
+mkdir -p config/includes.chroot/etc/init.d/
 mkdir -p config/includes.chroot/etc/rc0.d/
-cat > config/includes.chroot/etc/rc0.d/K01sr-network-logout <<EOF
+mkdir -p config/includes.chroot/etc/rc1.d/
+mkdir -p config/includes.chroot/etc/rc2.d/
+mkdir -p config/includes.chroot/etc/rc3.d/
+mkdir -p config/includes.chroot/etc/rc4.d/
+mkdir -p config/includes.chroot/etc/rc5.d/
+mkdir -p config/includes.chroot/etc/rc6.d/
+
+cat > config/includes.chroot/etc/init.d/sr-network-logout <<EOF
 #! /bin/sh
-wget -q -O /dev/null http://auth.net.studentrobotics.org/deauth_client.php
+### BEGIN INIT INFO
+# Provides:          sr-network-logout
+# Required-Start:    \$local_fs \$remote_fs \$network \$syslog \$named
+# Required-Stop:     \$local_fs \$remote_fs \$network \$syslog \$named
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: Log out of the SR network on shutdown
+### END INIT INFO
+
+
+case "\$1" in
+	start)
+		/usr/bin/wget -q -O /dev/null http://auth.net.studentrobotics.org/deauth_client.php
+		;;
+	stop)
+		/usr/bin/wget -q -O /dev/null http://auth.net.studentrobotics.org/deauth_client.php
+		;;
+esac
 EOF
-chmod +x config/includes.chroot/etc/rc0.d/K01sr-network-logout
+chmod +x config/includes.chroot/etc/init.d/sr-network-logout
+pushd config/includes.chroot/etc/rc0.d/ && ln -s ../init.d/sr-network-logout K01sr-network-logout && popd
+pushd config/includes.chroot/etc/rc1.d/ && ln -s ../init.d/sr-network-logout K01sr-network-logout && popd
+pushd config/includes.chroot/etc/rc2.d/ && ln -s ../init.d/sr-network-logout S01sr-network-logout && popd
+pushd config/includes.chroot/etc/rc3.d/ && ln -s ../init.d/sr-network-logout S01sr-network-logout && popd
+pushd config/includes.chroot/etc/rc4.d/ && ln -s ../init.d/sr-network-logout S01sr-network-logout && popd
+pushd config/includes.chroot/etc/rc5.d/ && ln -s ../init.d/sr-network-logout S01sr-network-logout && popd
+pushd config/includes.chroot/etc/rc6.d/ && ln -s ../init.d/sr-network-logout K01sr-network-logout && popd
+
