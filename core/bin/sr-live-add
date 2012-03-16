@@ -38,7 +38,7 @@ while [ $# -gt 0 ]; do
 
 	mkdir -p /srv/nfs/$1/live/
 
-	CONFIG_NAME=`gethostip $BOOT_SUBNET | awk '{print substr($3,0,6);}'`
+	CONFIG_NAME=`gethostip $BOOT_SUBNET | awk '{print substr($3,1,6);}'`
 
 	mkdir -p /srv/tftp/images/
 

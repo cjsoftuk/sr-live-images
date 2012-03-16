@@ -46,7 +46,7 @@ EOF
 IP_ADDRS=`ip addr | grep "inet " | grep -v "127.0.0.1" | awk '{print $2;}' | awk -F/ '{print $1;}'`
 
 for IP in $IP_ADDRS; do
-	SUBNET=`gethostip $IP | awk '{print substr($3,0,6);}'`
+	SUBNET=`gethostip $IP | awk '{print substr($3,1,6);}'`
 	cat <<EOF >/srv/tftp/pxelinux.cfg/$SUBNET
 include config/common.cfg
 include config/${SUBNET}-images.cfg
