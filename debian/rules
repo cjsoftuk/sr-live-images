@@ -7,6 +7,9 @@ include /usr/share/cdbs/1/rules/config-package.mk
 include /usr/share/cdbs/1/rules/divert.mk
 
 DOCS_sr-live-image-core = docs/sr-live-build.1.gz docs/sr-live-add.1.gz docs/sr-live-remove.1.gz docs/sr-live-init.1.gz
+DEB_DIVERT_FILES_sr-live-image-core += \
+	/etc/default/nfs-kernel-server.sr \
+	/etc/default/nfs-common.sr
 
 %.gz: %.man
 	gzip -c $< > $@
