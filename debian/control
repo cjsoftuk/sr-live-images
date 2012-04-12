@@ -7,7 +7,7 @@ Standards-Version: 3.8.0
 
 Package: sr-live-image-core
 Architecture: all
-Depends: atftpd, syslinux, nfs-kernel-server, nfs-common, live-build
+Depends: atftpd, syslinux, nfs-kernel-server, nfs-common, live-build (>= 3.0)
 Description: Student Robotics Live Image - Core
  Core tools and libraries for the SR Live boot configuration.  This depends
  on atftpd to serve the TFTP data, and PXELinux (part of syslinux) for the 
