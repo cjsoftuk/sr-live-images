@@ -36,6 +36,7 @@ python-yaml
 python-opencv
 python-cairo
 python-gtk2
+iceweasel
 EOF
 
 # Make the system log out of the competition network on shutdown.....
