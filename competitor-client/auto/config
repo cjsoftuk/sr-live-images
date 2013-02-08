@@ -39,13 +39,33 @@ cat <<EOF > config/includes.chroot/lib/live/config/999-pre-seed-browsers
 mkdir -p /home/user/.config/chromium/Default
 
 cat <<EOD >/home/user/.config/chromium/Default/Preferences
-{ 
-  "homepage" : "https://www.studentrobotics.org", 
-  "homepage_is_newtabpage" : true, 
-  "browser" : { 
-    "show_home_button" : true, 
-    "check_default_browser" : false
-  }
+{
+  "distribution": {
+     "auto_launch_chrome": false,
+     "import_bookmarks": false,
+     "import_history": false,
+     "import_home_page": false,
+     "import_search_engine": false,
+     "show_welcome_page": false,
+     "skip_first_run_ui": true,
+     "do_not_launch_chrome": false,
+     "make_chrome_default": false,
+     "make_chrome_default_for_user": false,
+     "require_eula": false,
+     "system_level": false,
+     "verbose_logging": true
+  },
+  "browser": {
+     "show_home_button": true
+  },
+  "bookmark_bar": {
+     "show_on_all_tabs": false
+  },
+  "first_run_tabs": [
+     "https://studentrobotics.org/"
+  ],
+  "homepage": "https://studentrobotics.org/",
+  "homepage_is_newtabpage": false
 }
 EOD
 touch /home/user/.config/chromium/First\\ Run
