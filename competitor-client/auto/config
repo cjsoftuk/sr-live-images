@@ -30,6 +30,27 @@ rm /tmp/auth_cert
 EOF
 chmod +x config/includes.chroot/lib/live/config/999-nss-self-signed-bodge
 
+# Preconfigure Chromium
+mkdir -p config/includes.chroot/lib/live/config/
+cat <<EOF > config/includes.chroot/lib/live/config/999-pre-seed-browsers
+#! /bin/bash
+
+# Create a chromium profile
+mkdir -p /home/user/.config/chromium/Default
+
+cat <<EOD >/home/user/.config/chromium/Default/Preferences
+{ 
+  "homepage" : "https://www.studentrobotics.org", 
+  "homepage_is_newtabpage" : true, 
+  "browser" : { 
+    "show_home_button" : true, 
+    "check_default_browser" : false
+  }
+}
+EOD
+touch /home/user/.config/chromium/First\\ Run
+EOF
+chmod +x config/includes.chroot/lib/live/config/999-pre-seed-browsers
 
 # Add the udev rule to hide disks
 mkdir -p config/includes.chroot/etc/udev/rules.d/
