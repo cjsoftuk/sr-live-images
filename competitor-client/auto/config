@@ -1,7 +1,7 @@
 #! /bin/bash
 
 # Create a basic config
-lb config noauto -d squeeze -a i386 -p "gnome" -m http://ftp.uk.debian.org/debian/ --net-root-path /srv/tftp/competitor-client --net-root-server 172.19.0.1 --bootappend-live "live-config.noroot" -b net
+lb config noauto -d squeeze -a i386 -p "gnome" -m http://ftp.uk.debian.org/debian/ --net-root-path /srv/tftp/competitor-client --net-root-server 172.19.0.1 --bootappend-live "live-config.noroot locales=en_GB.UTF-8 keyboard-layouts=gb keyboard-variants=nodeadkeys" -b net
 
 # Disable ntfs-3g
 mkdir -p config/apt/
@@ -14,8 +14,8 @@ EOF
 # Copy the SSL cert into the build
 mkdir -p config/includes.chroot/etc/ssl/certs/
 cp /etc/ssl/sr/*.pem config/includes.chroot/etc/ssl/certs/
-cp -r nssdb.tar.gz config/includes.chroot/lib/live/config
 mkdir -p config/includes.chroot/lib/live/config/
+cp -r nssdb.tar.gz config/includes.chroot/lib/live/config
 cat <<EOF > config/includes.chroot/lib/live/config/999-nss-self-signed-bodge
 #! /bin/bash
 
@@ -69,6 +69,7 @@ cat <<EOD >/home/user/.config/chromium/Default/Preferences
 }
 EOD
 touch /home/user/.config/chromium/First\\ Run
+chown -R user /home/user/.config
 EOF
 chmod +x config/includes.chroot/lib/live/config/999-pre-seed-browsers
 
@@ -92,6 +93,16 @@ sed -ri 's|^root(.*)$|root:\$6\$ib9QZokx\$tP4h4YXGaWIpIcRS8Vw1FS.FF1xbwzOckAc3et
 EOF
 chmod +x config/includes.chroot/lib/live/config/999-set-root-password
 
+# Remove NTFS support
+mkdir -p config/includes.chroot/lib/live/config/
+cat <<EOF > config/includes.chroot/lib/live/config/999-remove-ntfs3g
+#! /bin/bash
+
+# Set root's password on the target system
+apt-get -y purge ntfs-3g
+EOF
+chmod +x config/includes.chroot/lib/live/config/999-remove-ntfs3g
+
 # Add the set-root-password boot task
 mkdir -p config/includes.chroot/lib/live/config/
 cat <<EOF > config/includes.chroot/lib/live/config/999-zz_dynamic_config
@@ -113,7 +124,7 @@ chmod +x config/includes.chroot/lib/live/config/999-zz_dynamic_config
 # Add extra packages 
 mkdir -p config/package-lists/
 cat <<EOF >config/package-lists/sr-extra-apps.list.chroot
-ntpd
+ntp
 git-core
 vim
 geany

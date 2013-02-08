@@ -1,6 +1,7 @@
 sr-live-image (2013.2) squeeze; urgency=high
   * Remove ntfs-3g support
   * Add ntp sync support so that SSL doesn't break
+  * Add pre-populated profile for Chromium
 
  -- Chris Malton <cmalton@studentrobotics.org>  Fri, 08 Feb 2013 08:38:00 +0000
 
