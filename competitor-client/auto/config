@@ -3,6 +3,34 @@
 # Create a basic config
 lb config noauto -d squeeze -a i386 -p "gnome" -m http://ftp.uk.debian.org/debian/ --net-root-path /srv/tftp/competitor-client --net-root-server 172.19.0.1 --bootappend-live "live-config.noroot" -b net
 
+# Disable ntfs-3g
+mkdir -p config/apt/
+cat <<EOF >config/apt/preferences
+Package: ntfs-3g
+Pin: version *
+Pin-Priority: -1
+EOF
+
+# Copy the SSL cert into the build
+mkdir -p config/includes.chroot/etc/ssl/certs/
+cp /etc/ssl/sr/*.pem config/includes.chroot/etc/ssl/certs/
+cp -r nssdb.tar.gz config/includes.chroot/lib/live/config
+mkdir -p config/includes.chroot/lib/live/config/
+cat <<EOF > config/includes.chroot/lib/live/config/999-nss-self-signed-bodge
+#! /bin/bash
+
+# Do a bodge for NSS
+mkdir -p /home/user/.pki
+tar -zxvf /lib/live/config/nssdb.tar.gz -C /home/user/.pki/
+echo QUIT | openssl s_client -connect auth.net.studentrobotics.org:443 | sed -ne '/BEGIN CERT/,/END CERT/p' > /tmp/auth_cert
+export NSS_DEFAULT_DB_TYPE="sql"
+certutil -d /home/user/.pki/nssdb -A -t "C,," -n "SR_AUTH_CERT" -i /tmp/auth_cert
+chown -R user /home/user/.pki/nssdb
+rm /tmp/auth_cert
+EOF
+chmod +x config/includes.chroot/lib/live/config/999-nss-self-signed-bodge
+
+
 # Add the udev rule to hide disks
 mkdir -p config/includes.chroot/etc/udev/rules.d/
 cat <<EOF > config/includes.chroot/etc/udev/rules.d/999-hide-local-disks.rules
@@ -23,9 +51,28 @@ sed -ri 's|^root(.*)$|root:\$6\$ib9QZokx\$tP4h4YXGaWIpIcRS8Vw1FS.FF1xbwzOckAc3et
 EOF
 chmod +x config/includes.chroot/lib/live/config/999-set-root-password
 
+# Add the set-root-password boot task
+mkdir -p config/includes.chroot/lib/live/config/
+cat <<EOF > config/includes.chroot/lib/live/config/999-zz_dynamic_config
+MAC=\`ip link | grep -A 1 -E '[^@]eth[0-9]+\:' | tail -1 | awk '{print \$2;}' | sed 's/://g'\`
+wget -q -O /tmp/config.sh http://config.net.studentrobotics.org/\${MAC}.sh || true
+if [ -f /tmp/config.sh ]; then
+	chmod +x /tmp/config.sh
+	/tmp/config.sh
+else
+	wget -q -O /tmp/config.sh http://config.net.studentrobotics.org/default.sh || true
+	if [ -f /tmp/config.sh ]; then
+		chmod +x /tmp/config.sh
+		/tmp/config.sh
+	fi
+fi
+EOF
+chmod +x config/includes.chroot/lib/live/config/999-zz_dynamic_config
+
 # Add extra packages 
 mkdir -p config/package-lists/
 cat <<EOF >config/package-lists/sr-extra-apps.list.chroot
+ntpd
 git-core
 vim
 geany
@@ -37,6 +84,23 @@ python-opencv
 python-cairo
 python-gtk2
 iceweasel
+libnss3-tools
+openssh-server
+screen
+zsh
+vim-gtk
+emacs
+tmux
+openjdk-6-jre
+openjdk-6-jdk
+pylint
+python-scipy
+python-matplotlib
+geda
+pcb
+vlc
+zip
+unzip
 EOF
 
 # Make the system log out of the competition network on shutdown.....
@@ -71,11 +135,11 @@ case "\$1" in
 esac
 EOF
 chmod +x config/includes.chroot/etc/init.d/sr-network-logout
-pushd config/includes.chroot/etc/rc0.d/ && ln -s ../init.d/sr-network-logout K01sr-network-logout && popd
-pushd config/includes.chroot/etc/rc1.d/ && ln -s ../init.d/sr-network-logout K01sr-network-logout && popd
-pushd config/includes.chroot/etc/rc2.d/ && ln -s ../init.d/sr-network-logout S01sr-network-logout && popd
-pushd config/includes.chroot/etc/rc3.d/ && ln -s ../init.d/sr-network-logout S01sr-network-logout && popd
-pushd config/includes.chroot/etc/rc4.d/ && ln -s ../init.d/sr-network-logout S01sr-network-logout && popd
-pushd config/includes.chroot/etc/rc5.d/ && ln -s ../init.d/sr-network-logout S01sr-network-logout && popd
-pushd config/includes.chroot/etc/rc6.d/ && ln -s ../init.d/sr-network-logout K01sr-network-logout && popd
+pushd config/includes.chroot/etc/rc0.d/ && ln -sf ../init.d/sr-network-logout K01sr-network-logout && popd
+pushd config/includes.chroot/etc/rc1.d/ && ln -sf ../init.d/sr-network-logout K01sr-network-logout && popd
+pushd config/includes.chroot/etc/rc2.d/ && ln -sf ../init.d/sr-network-logout S01sr-network-logout && popd
+pushd config/includes.chroot/etc/rc3.d/ && ln -sf ../init.d/sr-network-logout S01sr-network-logout && popd
+pushd config/includes.chroot/etc/rc4.d/ && ln -sf ../init.d/sr-network-logout S01sr-network-logout && popd
+pushd config/includes.chroot/etc/rc5.d/ && ln -sf ../init.d/sr-network-logout S01sr-network-logout && popd
+pushd config/includes.chroot/etc/rc6.d/ && ln -sf ../init.d/sr-network-logout K01sr-network-logout && popd
 
