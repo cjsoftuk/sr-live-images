@@ -43,7 +43,7 @@ timeout 600
 prompt 0
 EOF
 
-IP_ADDRS=`ip addr | grep "inet " | grep -v "127.0.0.1" | awk '{print $2;}' | awk -F/ '{print $1;}'`
+IP_ADDRS=`cat /etc/network/interfaces | grep "address " | grep -v "hwaddress" | grep -v "127.0.0.1" | awk '{print $2;}' | awk -F/ '{print $1;}'`
 
 for IP in $IP_ADDRS; do
 	SUBNET=`gethostip $IP | awk '{print substr($3,1,6);}'`
