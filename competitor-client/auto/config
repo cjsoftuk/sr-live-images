@@ -30,6 +30,89 @@ rm /tmp/auth_cert
 EOF
 chmod +x config/includes.chroot/lib/live/config/999-nss-self-signed-bodge
 
+# Get sanity with Gnome 3
+mkdir -p config/includes.chroot/lib/live/config/
+cat <<EOF > config/includes.chroot/lib/live/config/999-sane-gnome3
+#! /bin/bash
+
+mkdir -p /home/user/.config/autostart
+cat <<EOD >/home/user/.config/autostart/show-desktop-icons.desktop
+[Desktop Entry]
+Type=Application
+Name = Show desktop Icons
+Exec = dconf write /org/gnome/desktop/background/show-desktop-icons true
+Comment = Turn on the desktop icons that are otherwise off.
+X-GNOME-Autostart-Delay=1
+EOD
+
+cat <<EOD >/home/user/.config/autostart/no-idle-blanking.desktop
+[Desktop Entry]
+Type=Application
+Name = Disable idle screensaver
+Exec = dconf write /org/gnome/desktop/screensaver/idle-activation-enabled false
+Comment = Disable idle screensaver
+X-GNOME-Autostart-Delay=1
+EOD
+
+cat <<EOD >/home/user/.config/autostart/no-idle-blanking.desktop
+[Desktop Entry]
+Type=Application
+Name = Disable idle lock
+Exec = dconf write /org/gnome/desktop/screensaver/lock-enabled false
+Comment = Disable idle lock
+X-GNOME-Autostart-Delay=1
+EOD
+
+chown -R user /home/user/.config
+
+EOF
+chmod +x config/includes.chroot/lib/live/config/999-sane-gnome3
+
+# Add useful desktop icons
+mkdir -p config/includes.chroot/lib/live/config/
+cat <<EOF > config/includes.chroot/lib/live/config/999-desktop-icons
+
+mkdir -p /home/user/Desktop
+cat <<EOD >/home/user/Desktop/srobo-ide.desktop
+[Desktop Entry]
+Type=Application
+Name = Student Robotics IDE
+Exec = chromium-browser --app=https://www.studentrobotics.org/ide/
+Icon = /usr/share/pixmaps/chromium-browser.png
+Comment = Develop code for your robot in the Student Robotics IDE
+EOD
+
+cat <<EOD >/home/user/Desktop/srobo-docs.desktop
+[Desktop Entry]
+Type=Application
+Name = Student Robotics Documentation
+Exec = chromium-browser https://www.studentrobotics.org/docs/
+Icon = /usr/share/pixmaps/chromium-browser.png
+Comment = View documentation for the Student Robotics kit
+EOD
+
+cat <<EOD >/home/user/Desktop/python-docs.desktop
+[Desktop Entry]
+Type=Application
+Name = Python Documentation
+Exec = chromium-browser http://docs.python.org/
+Icon = /usr/share/pixmaps/chromium-browser.png
+Comment = View the documentation for the Python programming language
+EOD
+
+cat <<EOD >/home/user/Desktop/chromium.desktop
+[Desktop Entry]
+Type=Application
+Name = Chromium (Web Browser)
+Exec = chromium-browser
+Icon = /usr/share/pixmaps/chromium-browser.png
+Comment = Browse the internet
+EOD
+
+chown -R user /home/user/Desktop
+EOF
+chmod +x config/includes.chroot/lib/live/config/999-desktop-icons
+
 # Preconfigure Chromium
 mkdir -p config/includes.chroot/lib/live/config/
 cat <<EOF > config/includes.chroot/lib/live/config/999-pre-seed-browsers
