@@ -4,66 +4,68 @@ set -e
 # Add new image(s) to the config file.
 
 while [ $# -gt 0 ]; do
-	if [ ! -d /usr/share/sr-live-image/$1 ]; then
-		echo "E: $1 is not a valid image name!"
-		exit 1
-	fi
-	if [ ! -f /usr/share/sr-live-image/$1/binary/live/filesystem.squashfs ]; then
-		echo "E: $1 is not a built image.  Use sr-live-build to build this live image!"
-		exit 1
-	fi
+    if [ ! -d /usr/share/sr-live-image/$1 ]; then
+        echo "E: $1 is not a valid image name!"
+        exit 1
+    fi
+    if [ ! -f /usr/share/sr-live-image/$1/binary/live/filesystem.squashfs ]; then
+        echo "E: $1 is not a built image.  Use sr-live-build to build this live image!"
+        exit 1
+    fi
 
-	if [ ! -f /usr/share/sr-live-image/$1/bootloader.cfg ]; then
-		echo "E: Missing bootloader.cfg for image $1."
-		exit 1
-	fi
+    if [ ! -f /usr/share/sr-live-image/$1/bootloader.cfg ]; then
+        echo "E: Missing bootloader.cfg for image $1."
+        exit 1
+    fi
 
-	# We have a root FS, and bootloader config
-	. /usr/share/sr-live-image/$1/bootloader.cfg
+    # We have a root FS, and bootloader config
+    . /usr/share/sr-live-image/$1/bootloader.cfg
 
-	if [ "$BOOT_SUBNET" = "" ]; then
-		echo "E: BOOT_SUBNET is not set.  Cannot configure for unknown subnet."
-		exit 1
-	fi
+    if [ "$BOOT_SUBNET" = "" ]; then
+        echo "E: BOOT_SUBNET is not set.  Cannot configure for unknown subnet."
+        exit 1
+    fi
 
-	if [ ! -f /usr/share/sr-live-image/$1/binary/live/${BOOT_KERNEL} ]; then
-		echo "E: BOOT_KERNEL not found.  Did the image build completely?"
-		exit 1
-	fi
+    if [ ! -f /usr/share/sr-live-image/$1/binary/live/${BOOT_KERNEL} ]; then
+        echo "E: BOOT_KERNEL not found.  Did the image build completely?"
+        exit 1
+    fi
 
-	if [ ! -f /usr/share/sr-live-image/$1/binary/live/${BOOT_INITRD} ]; then
-		echo "E: BOOT_INITRD not found.  Did the image build completely?"
-		exit 1
-	fi
+    if [ ! -f /usr/share/sr-live-image/$1/binary/live/${BOOT_INITRD} ]; then
+        echo "E: BOOT_INITRD not found.  Did the image build completely?"
+        exit 1
+    fi
 
-	mkdir -p /srv/nfs/$1/live/
+    mkdir -p /srv/nfs/$1/live/
 
-	CONFIG_NAME=`gethostip $BOOT_SUBNET | awk '{print substr($3,1,6);}'`
+    CONFIG_NAME=`gethostip $BOOT_SUBNET | awk '{print substr($3,1,6);}'`
 
-	mkdir -p /srv/tftp/images/
+    mkdir -p /srv/tftp/images/
 
-	cp /usr/share/sr-live-image/$1/binary/live/$BOOT_KERNEL /srv/tftp/images/vmlinuz-$1
-	cp /usr/share/sr-live-image/$1/binary/live/$BOOT_INITRD /srv/tftp/images/initrd.img-$1
-	cp /usr/share/sr-live-image/$1/binary/live/filesystem.squashfs /srv/nfs/$1/live/
+    cp /usr/share/sr-live-image/$1/binary/live/$BOOT_KERNEL /srv/tftp/images/vmlinuz-$1
+    cp /usr/share/sr-live-image/$1/binary/live/$BOOT_INITRD /srv/tftp/images/initrd.img-$1
+    cp /usr/share/sr-live-image/$1/binary/live/filesystem.squashfs /srv/nfs/$1/live/
 
-	for IP in `ip addr | grep "inet " | grep -v "127.0.0.1" | awk '{print $2;}' | awk -F/ '{print $1;}'`; do
-		SUBNET=`echo $IP | awk -F. '{print $1 "." $2 "." $3 ".0";}'`
-		if [ "$SUBNET" = "$BOOT_SUBNET" ]; then
-			BOOT_IP="$IP"
-		fi
-	done
+    for IP in `ip addr | grep "inet " | grep -v "127.0.0.1" | awk '{print $2;}' | awk -F/ '{print $1;}'`; do
+        SUBNET=`echo $IP | awk -F. '{print $1 "." $2 "." $3 ".0";}'`
+        if [ "$SUBNET" = "$BOOT_SUBNET" ]; then
+            BOOT_IP="$IP"
+        fi
+    done
 
-	cat <<EOF >/srv/tftp/config/$1.cfg
+    cat <<EOF >/srv/tftp/config/$1.cfg
 label $1
-	menu label ${BOOT_LABEL}
-	kernel images/vmlinuz-$1
-	append initrd=images/initrd.img-$1 boot=live config netboot=nfs nfsroot=${BOOT_IP}:/srv/nfs/$1/ quiet ${BOOT_APPEND_EXTRA}
+    menu label ${BOOT_LABEL}
+    kernel images/vmlinuz-$1
+    append initrd=images/initrd.img-$1 boot=live config netboot=nfs nfsroot=${BOOT_IP}:/srv/nfs/$1/ quiet ${BOOT_APPEND_EXTRA}
 
 EOF
 
-	# Get rid of any old references
-	sed -Ei 's|^include config/$1.cfg||' /srv/tftp/config/${CONFIG_NAME}-images.cfg
-	echo "include config/$1.cfg" >> /srv/tftp/config/${CONFIG_NAME}-images.cfg
-	
-	shift
+    # Get rid of any old references
+    if [ -f /srv/tftp/config/${CONFIG_NAME}-images.cfg ]; then
+        sed -Ei 's|^include config/$1.cfg||' /srv/tftp/config/${CONFIG_NAME}-images.cfg
+    fi
+    echo "include config/$1.cfg" >> /srv/tftp/config/${CONFIG_NAME}-images.cfg
+
+    shift
 done
